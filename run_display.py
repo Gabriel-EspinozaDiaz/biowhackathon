@@ -64,8 +64,8 @@ def run_simulation():
     for spine in ax.spines.values():
         spine.set_edgecolor("#334155")
 
-    title = ("Navier–Stokes Fluid Simulator  |  "
-             f"{vel_x}×{vel_y} grid  |  ν = {viscosity} cm²/s")
+    title = ("Navier-Stokes Fluid Simulator  |  "
+             f"{vel_x}*{vel_y} grid  |  v = {viscosity} cm²/s")
     ax.set_title(title, color="white", fontsize=10, pad=10)
 
     # Box boundary

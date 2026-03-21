@@ -3,15 +3,6 @@ from scipy.ndimage import map_coordinates
 
 
 class Particle:
-    """
-    A tracer particle advected by the fluid velocity field.
-
-    Parameters
-    ----------
-    x, y     : float – starting position in cm from the centre of the box
-    diameter : float – fixed particle diameter in cm
-    color    : str   – matplotlib colour string used when rendering
-    """
 
     def __init__(self, x: float, y: float, diameter: float,
                  color: str = "red"):
@@ -26,10 +17,7 @@ class Particle:
     def update(self, u: np.ndarray, v: np.ndarray,
                dt: float, box_size: float,
                vel_x: int, vel_y: int) -> None:
-        """
-        Advance position by *dt* seconds using bilinear interpolation
-        of the velocity field (u, v).
-        """
+
         dx   = box_size / (vel_x - 1)
         dy   = box_size / (vel_y - 1)
         half = box_size / 2.0

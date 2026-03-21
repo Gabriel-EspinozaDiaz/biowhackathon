@@ -163,3 +163,5 @@ class FluidSimulator:
         self.u[:,  0] = 0;  self.u[:, -1] = 0
         self.v[ 0, :] = 0;  self.v[-1, :] = 0
         self.v[:,  0] = 0;  self.v[:, -1] = 0
+    
+
