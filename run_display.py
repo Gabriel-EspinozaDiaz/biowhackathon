@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.animation import FuncAnimation
+from matplotlib.widgets import TextBox, Button
 
 from FluidSimulator import FluidSimulator
 from Particle import Particle
@@ -47,10 +48,6 @@ def run_simulation():
     ]
     for px, py, diam, col in particle_specs:
         sim.add_particle(Particle(px, py, diameter=diam, color=col))
-
-    # ── Add waves ─────────────────────────────────────────────────────────────
-    sim.wave_from_direction(amplitude=1.0, frequency=1.0, direction="left")
-    sim.wave_from_direction(amplitude=0.5, frequency=2.0, direction="top")
 
     # ── Figure / axes ─────────────────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -121,6 +118,62 @@ def run_simulation():
         transform=ax.transAxes, color="white",
         fontsize=9, va="top", family="monospace"
     )
+
+    # ── Interactive Widgets ───────────────────────────────────────────────────
+    plt.subplots_adjust(bottom=0.35)  # Make space for widgets
+
+    directions = ['top', 'left', 'right', 'bottom']
+    current_wave_params = {d: {'amplitude': 0.0, 'frequency': 0.0, 'speed': 1.0} for d in directions}
+    text_boxes = {}
+
+    def update_wave(direction, param, value):
+        try:
+            val = float(value)
+        except ValueError:
+            return
+        current_wave_params[direction][param] = val
+        # Remove existing wave for this direction
+        sim.waves = [w for w in sim.waves if w['direction'] != direction]
+        # Add if amplitude and frequency are positive
+        if current_wave_params[direction]['amplitude'] > 0 and current_wave_params[direction]['frequency'] > 0:
+            sim.waves.append({
+                'direction': direction,
+                'amplitude': current_wave_params[direction]['amplitude'],
+                'frequency': current_wave_params[direction]['frequency'],
+                'speed': current_wave_params[direction]['speed']
+            })
+
+    def clear_all_waves(event):
+        sim.clear_waves()
+        for d in directions:
+            current_wave_params[d] = {'amplitude': 0.0, 'frequency': 0.0, 'speed': 1.0}
+            text_boxes[f'{d}_amp'].set_val('0.0')
+            text_boxes[f'{d}_freq'].set_val('0.0')
+            text_boxes[f'{d}_speed'].set_val('1.0')
+
+    for i, dir in enumerate(directions):
+        # Amplitude box
+        ax_amp = plt.axes([0.05, 0.30 - i*0.06, 0.15, 0.04])
+        tb_amp = TextBox(ax_amp, f'{dir.capitalize()} Amp:', initial='0.0')
+        tb_amp.on_submit(lambda text, d=dir, p='amplitude': update_wave(d, p, text))
+        text_boxes[f'{dir}_amp'] = tb_amp
+
+        # Frequency box
+        ax_freq = plt.axes([0.25, 0.30 - i*0.06, 0.15, 0.04])
+        tb_freq = TextBox(ax_freq, f'{dir.capitalize()} Freq:', initial='0.0')
+        tb_freq.on_submit(lambda text, d=dir, p='frequency': update_wave(d, p, text))
+        text_boxes[f'{dir}_freq'] = tb_freq
+
+        # Speed box
+        ax_speed = plt.axes([0.45, 0.30 - i*0.06, 0.15, 0.04])
+        tb_speed = TextBox(ax_speed, f'{dir.capitalize()} Speed:', initial='1.0')
+        tb_speed.on_submit(lambda text, d=dir, p='speed': update_wave(d, p, text))
+        text_boxes[f'{dir}_speed'] = tb_speed
+
+    # Clear button
+    ax_button = plt.axes([0.65, 0.10, 0.25, 0.05])
+    button = Button(ax_button, 'Clear All Waves')
+    button.on_clicked(clear_all_waves)
 
     # ── Animation update ───────────────────────────────────────────────────────
     frame = [0]
