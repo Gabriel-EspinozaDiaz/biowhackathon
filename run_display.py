@@ -60,9 +60,9 @@ def run_simulation():
     ax.set_ylim(-half, half)
     ax.set_facecolor("#ADD5EE")
     fig.patch.set_facecolor("#9D9D9D")
-    ax.set_xlabel("x  (cm)", color="grey")
-    ax.set_ylabel("y  (cm)", color="grey")
-    ax.tick_params(colors="grey")
+    ax.set_xlabel("x  (cm)", color="black")
+    ax.set_ylabel("y  (cm)", color="black")
+    ax.tick_params(colors="black")
     for spine in ax.spines.values():
         spine.set_edgecolor("#334155")
 
@@ -118,7 +118,7 @@ def run_simulation():
 
     time_text = ax.text(
         0.02, 0.975, "t = 0.00 s",
-        transform=ax.transAxes, color="white",
+        transform=ax.transAxes, color="black",
         fontsize=9, va="top", family="monospace"
     )
 
