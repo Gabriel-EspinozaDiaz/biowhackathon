@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from matplotlib.animation import FuncAnimation
 
-from FluidSimulator import FluidSimulator
-from Particle import Particle
+from meeting_fluid_dynamics.FluidSimulator import FluidSimulator
+from meeting_fluid_dynamics.Particle import Particle
 
 # ─── Simulation parameters ────────────────────────────────────────────────────
 box_size  = 10.0    # Side-length of the square box (cm)
@@ -54,7 +54,7 @@ def run_simulation():
     half = box_size / 2.0
     ax.set_xlim(-half, half)
     ax.set_ylim(-half, half)
-    ax.set_facecolor("#ADD5EE")
+    ax.set_facecolor("#597485")
     fig.patch.set_facecolor("#9D9D9D")
     ax.set_xlabel("x  (cm)", color="black")
     ax.set_ylabel("y  (cm)", color="black")
@@ -64,7 +64,7 @@ def run_simulation():
 
     title = ("Navier-Stokes Fluid Simulator  |  "
              f"{vel_x}*{vel_y} grid  |  v = {viscosity} cm²/s")
-    ax.set_title(title, color="white", fontsize=10, pad=10)
+    ax.set_title(title, color="black", fontsize=10, pad=10)
 
     # Box boundary
     box_rect = mpatches.FancyBboxPatch(
@@ -87,16 +87,13 @@ def run_simulation():
     cbar.ax.yaxis.set_tick_params(color="black")
     plt.setp(cbar.ax.yaxis.get_ticklabels(), color="black", fontsize=7)
 
-    # ── Quiver (velocity direction arrows) ────────────────────────────────────
+    # ── Quiver (velocity direction arrows hidden, vector field still available) ──
     X, Y = sim.grid_coords()
     stride = max(1, min(vel_x, vel_y) // 14)    # subsample for readability
-    Xq = X[::stride, ::stride]
-    Yq = Y[::stride, ::stride]
     quiv = ax.quiver(
-        Xq, Yq,
-        sim.u[::stride, ::stride],
-        sim.v[::stride, ::stride],
-        color="#7dd3fc", alpha=0.65,
+        X[::stride, ::stride], Y[::stride, ::stride],
+        sim.u[::stride, ::stride], sim.v[::stride, ::stride],
+        color="#7dd3fc", alpha=0.0,
         scale=25, width=0.003, zorder=4
     )
 
@@ -114,16 +111,25 @@ def run_simulation():
 
     time_text = ax.text(
         0.02, 0.975, "t = 0.00 s",
-        transform=ax.transAxes, color="black",
+        transform=ax.transAxes, color="white",
         fontsize=9, va="top", family="monospace"
     )
 
     # ── Animation update ───────────────────────────────────────────────────────
     frame = [0]
     left_on = True
+    proximity_triggered = [False]
+
+    def check_particle_distance():
+        if len(sim.particles) < 2:
+            return False
+        p0, p1 = sim.particles[0], sim.particles[1]
+        distance = np.hypot(p0.x - p1.x, p0.y - p1.y)
+        return distance <= 0.25
 
     def update(_):
         nonlocal left_on
+
         # Toggle left wave every 2 seconds (50 frames at dt=0.04)
         if frame[0] % 20 == 0:
             left_on = not left_on
@@ -134,6 +140,18 @@ def run_simulation():
 
         sim.step(dt)
         frame[0] += 1
+
+        if check_particle_distance():
+            if not proximity_triggered[0]:
+                proximity_triggered[0] = True
+            sim.clear_waves()
+            sim.wave_from_direction(amplitude=1.0, frequency=1.0, direction="left")
+            sim.wave_from_direction(amplitude=1.0, frequency=1.0, direction="right")
+
+        if proximity_triggered[0]:
+            time_text.set_color("red")
+        else:
+            time_text.set_color("white")
 
         # Heat-map
         speed = np.sqrt(sim.u**2 + sim.v**2)
