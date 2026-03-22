@@ -48,7 +48,7 @@ def run_simulation():
 
     # ── Add waves ─────────────────────────────────────────────────────────────
     sim.wave_from_direction(amplitude=1.0, frequency=0.8, direction="left")
-    sim.wave_from_direction(amplitude=1.0, frequency=0.8, direction="top")
+    sim.wave_from_direction(amplitude=1.0, frequency=0.8, direction="right", phase=np.pi)
 
     # ── Figure / axes ─────────────────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -98,7 +98,7 @@ def run_simulation():
         Xq, Yq,
         sim.u[::stride, ::stride],
         sim.v[::stride, ::stride],
-        color="#7dd3fc", alpha=0,
+        color="#7dd3fc", alpha=1.0,
         scale=25, width=0.003, zorder=4
     )
 
