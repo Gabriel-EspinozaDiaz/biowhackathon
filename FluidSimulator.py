@@ -34,6 +34,10 @@ class FluidSimulator:
         self.particles: list[Particle] = []
         self.vacuum_sources: list[dict] = []
 
+        # Wave parameters - list to support multiple waves
+        self.time = 0.0
+        self.waves = []  # list of dicts: {"amplitude", "frequency", "direction", "speed"}
+
     # ── Public API ────────────────────────────────────────────────────────────
 
     def add_particle(self, particle: Particle) -> None:
@@ -53,6 +57,7 @@ class FluidSimulator:
     def step(self, dt: float = 0.04) -> None:
         """Advance the simulation by one time step *dt* (seconds)."""
         self._apply_body_forces(dt)
+        self._apply_wave_forces(dt)
         self.u, self.v = self._advect(dt)
         self._diffuse(dt)
         self._project(iterations=40)
@@ -62,6 +67,7 @@ class FluidSimulator:
                 self.u, self.v, dt,
                 self.box_size, self.vel_x, self.vel_y
             )
+        self.time += dt
 
     # ── Private helpers ───────────────────────────────────────────────────────
 
@@ -87,6 +93,29 @@ class FluidSimulator:
             force = vac["strength"] / r2
             self.u += force * (rx / r) * dt
             self.v += force * (ry / r) * dt
+
+    def _apply_wave_forces(self, dt: float) -> None:
+        """Add wave-induced velocity perturbations."""
+        if not self.waves:
+            return
+        X, Y = self.grid_coords()
+        for wave in self.waves:
+            freq = wave["frequency"]
+            amp = wave["amplitude"]
+            speed = wave["speed"]
+            direction = wave["direction"]
+            if direction == "left":
+                phase = 2 * np.pi * freq * (self.time - X / speed)
+                self.u += amp * np.sin(phase)
+            elif direction == "right":
+                phase = 2 * np.pi * freq * (self.time + X / speed)
+                self.u += amp * np.sin(phase)
+            elif direction == "top":
+                phase = 2 * np.pi * freq * (self.time - Y / speed)
+                self.v += amp * np.sin(phase)
+            elif direction == "bottom":
+                phase = 2 * np.pi * freq * (self.time + Y / speed)
+                self.v += amp * np.sin(phase)
 
     def _advect(self, dt: float) -> tuple[np.ndarray, np.ndarray]:
         """
@@ -164,4 +193,15 @@ class FluidSimulator:
         self.v[ 0, :] = 0;  self.v[-1, :] = 0
         self.v[:,  0] = 0;  self.v[:, -1] = 0
     
+    def wave_from_direction(self, amplitude: float, frequency: float, direction: str, speed: float = 1.0):
+        """Add a soundwave coming from the specified direction. Can be called multiple times for multiple waves."""
+        self.waves.append({
+            "amplitude": amplitude,
+            "frequency": frequency,
+            "direction": direction,
+            "speed": speed
+        })
 
+    def clear_waves(self) -> None:
+        """Remove all active waves."""
+        self.waves = []

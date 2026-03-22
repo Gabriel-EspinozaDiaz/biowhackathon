@@ -18,8 +18,8 @@ from Particle import Particle
 
 # ─── Simulation parameters ────────────────────────────────────────────────────
 box_size  = 10.0    # Side-length of the square box (cm)
-vel_x     = 40      # Number of velocity grid points along x
-vel_y     = 40      # Number of velocity grid points along y
+vel_x     = 64      # Number of velocity grid points along x
+vel_y     = 64      # Number of velocity grid points along y
 viscosity = 0.15    # Kinematic viscosity  (cm² / s)
 dt        = 0.04    # Time-step  (s)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -36,19 +36,21 @@ def run_simulation():
 
     # ── Particles  (x, y from centre, diameter in cm) ─────────────────────────
     particle_specs = [
-        (-4.0, -4.0, 0.40, "#e74c3c"),
-        ( 4.0, -4.0, 0.40, "#3498db"),
-        (-4.0,  4.0, 0.40, "#2ecc71"),
-        ( 4.0,  4.0, 0.40, "#f39c12"),
-        ( 0.0, -4.5, 0.35, "#9b59b6"),
-        ( 0.0,  4.5, 0.35, "#1abc9c"),
-        (-4.5,  0.0, 0.35, "#e67e22"),
-        ( 4.5,  0.0, 0.35, "#e91e63"),
-        (-2.0,  3.0, 0.30, "#00bcd4"),
-        ( 2.0, -3.0, 0.30, "#cddc39"),
+        (-4.0, -4.0, 0.20, "#883d35"),
+        ( 4.0, -3.0, 0.20, "#3498db"),
+        (-4.0,  2.0, 0.20, "#2ecc71"),
+        ( 4.0,  1.0, 0.20, "#f39c12"),
+        ( 0.0, -4.5, 0.15, "#9b59b6"),
+        ( 0.0,  4.5, 0.15, "#1abc9c"),
+        (-4.5,  0.0, 0.15, "#e67e22"),
+
     ]
     for px, py, diam, col in particle_specs:
         sim.add_particle(Particle(px, py, diameter=diam, color=col))
+
+    # ── Add waves ─────────────────────────────────────────────────────────────
+    sim.wave_from_direction(amplitude=1.0, frequency=1.0, direction="left")
+    sim.wave_from_direction(amplitude=0.5, frequency=2.0, direction="top")
 
     # ── Figure / axes ─────────────────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -56,8 +58,8 @@ def run_simulation():
     half = box_size / 2.0
     ax.set_xlim(-half, half)
     ax.set_ylim(-half, half)
-    ax.set_facecolor("#ffffff")
-    fig.patch.set_facecolor("#9c9c9c")
+    ax.set_facecolor("#ADD5EE")
+    fig.patch.set_facecolor("#9D9D9D")
     ax.set_xlabel("x  (cm)", color="grey")
     ax.set_ylabel("y  (cm)", color="grey")
     ax.tick_params(colors="grey")
@@ -85,9 +87,9 @@ def run_simulation():
         alpha=0.55, vmin=0, vmax=4, zorder=1
     )
     cbar = fig.colorbar(im, ax=ax, fraction=0.03, pad=0.02)
-    cbar.set_label("|velocity|  (cm/s)", color="grey", fontsize=8)
-    cbar.ax.yaxis.set_tick_params(color="grey")
-    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="grey", fontsize=7)
+    cbar.set_label("|velocity|  (cm/s)", color="black", fontsize=8)
+    cbar.ax.yaxis.set_tick_params(color="black")
+    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="black", fontsize=7)
 
     # ── Quiver (velocity direction arrows) ────────────────────────────────────
     X, Y = sim.grid_coords()
