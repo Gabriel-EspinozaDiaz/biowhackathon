@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.ndimage import map_coordinates
-from Particle import Particle
+from .Particle import Particle
 
 
 class FluidSimulator:
