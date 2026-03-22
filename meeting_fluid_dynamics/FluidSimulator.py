@@ -104,17 +104,18 @@ class FluidSimulator:
             amp = wave["amplitude"]
             speed = wave["speed"]
             direction = wave["direction"]
+            phase_offset = wave.get("phase", 0.0)
             if direction == "left":
-                phase = 2 * np.pi * freq * (self.time - X / speed)
+                phase = 2 * np.pi * freq * (self.time - X / speed) + phase_offset
                 self.u += amp * np.sin(phase)
             elif direction == "right":
-                phase = 2 * np.pi * freq * (self.time + X / speed)
+                phase = 2 * np.pi * freq * (self.time + X / speed) + phase_offset
                 self.u += amp * np.sin(phase)
             elif direction == "top":
-                phase = 2 * np.pi * freq * (self.time - Y / speed)
+                phase = 2 * np.pi * freq * (self.time - Y / speed) + phase_offset
                 self.v += amp * np.sin(phase)
             elif direction == "bottom":
-                phase = 2 * np.pi * freq * (self.time + Y / speed)
+                phase = 2 * np.pi * freq * (self.time + Y / speed) + phase_offset
                 self.v += amp * np.sin(phase)
 
     def _advect(self, dt: float) -> tuple[np.ndarray, np.ndarray]:
@@ -193,13 +194,14 @@ class FluidSimulator:
         self.v[ 0, :] = 0;  self.v[-1, :] = 0
         self.v[:,  0] = 0;  self.v[:, -1] = 0
     
-    def wave_from_direction(self, amplitude: float, frequency: float, direction: str, speed: float = 1.0):
+    def wave_from_direction(self, amplitude: float, frequency: float, direction: str, speed: float = 1.0, phase: float = 0.0):
         """Add a soundwave coming from the specified direction. Can be called multiple times for multiple waves."""
         self.waves.append({
             "amplitude": amplitude,
             "frequency": frequency,
             "direction": direction,
-            "speed": speed
+            "speed": speed,
+            "phase": phase
         })
 
     def clear_waves(self) -> None:
