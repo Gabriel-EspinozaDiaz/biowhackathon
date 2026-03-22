@@ -1,6 +1,6 @@
 # Team Biowhackathon Repository
 
-Our team proposes a novel method of producing highly polarised magnets in microgravity, using a combination of biological agents as molecular scaffolding, and soundwaves to control the compartmentalisation and mixing of our reagents in a single vessel.
+Our team proposes a novel method of using monodispersed nanocrystal templating in anisotropic composites to produce highly polarised rare earth free permenant magnets in microgravity, using a combination of biological agents as molecular scaffolding, and soundwaves to control the compartmentalisation and mixing of our reagents in a single vessel.
 
 This repository demos a simple simulation
 
