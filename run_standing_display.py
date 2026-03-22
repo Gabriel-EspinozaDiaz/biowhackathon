@@ -36,11 +36,11 @@ def run_simulation():
 
     # ── Particles  (x, y from centre, diameter in cm) ─────────────────────────
     particle_specs = [
-        (-3.0, -3.0, 0.20, "#883d35"),
-        ( 3.0, -1.0, 0.20, "#3498db"),
-        ( 2.2,  1.0, 0.20, "#f39c12"),
-        ( 0.0, -1.8, 0.15, "#9b59b6"),
-        ( 0.0,  3.0, 0.15, "#1abc9c"),
+        (-3.0, -3.0, 0.20, "#d8d8d8"),
+        ( 3.0, -1.0, 0.20, "#9f9f9f"),
+        ( 2.2,  1.0, 0.20, "#5F5F5F"),
+        ( 0.0, -1.8, 0.15, "#b3b3b3"),
+        ( 0.0,  3.0, 0.15, "#bbbbbb"),
 
     ]
     for px, py, diam, col in particle_specs:
@@ -98,7 +98,7 @@ def run_simulation():
         Xq, Yq,
         sim.u[::stride, ::stride],
         sim.v[::stride, ::stride],
-        color="#7dd3fc", alpha=1.0,
+        color="#cd2121", alpha=1.0,
         scale=25, width=0.003, zorder=4
     )
 
