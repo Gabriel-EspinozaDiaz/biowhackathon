@@ -36,21 +36,17 @@ def run_simulation():
 
     # ── Particles  (x, y from centre, diameter in cm) ─────────────────────────
     particle_specs = [
-        (-4.0, -4.0, 0.20, "#883d35"),
-        ( 4.0, -3.0, 0.20, "#3498db"),
-        (-4.0,  2.0, 0.20, "#2ecc71"),
-        ( 4.0,  1.0, 0.20, "#f39c12"),
-        ( 0.0, -4.5, 0.15, "#9b59b6"),
-        ( 0.0,  4.5, 0.15, "#1abc9c"),
-        (-4.5,  0.0, 0.15, "#e67e22"),
+        (-2.0, 0, 0.20, "#883d35"),
+        ( 2.0, 0, 0.20, "#3498db"),
+
 
     ]
     for px, py, diam, col in particle_specs:
         sim.add_particle(Particle(px, py, diameter=diam, color=col))
 
     # ── Add waves ─────────────────────────────────────────────────────────────
-    sim.wave_from_direction(amplitude=1.0, frequency=1.0, direction="left")
-    sim.wave_from_direction(amplitude=0.5, frequency=2.0, direction="top")
+    sim.wave_from_direction(amplitude=-1.0, frequency=1.2, direction="right")
+
 
     # ── Figure / axes ─────────────────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(8, 8))
@@ -124,8 +120,18 @@ def run_simulation():
 
     # ── Animation update ───────────────────────────────────────────────────────
     frame = [0]
+    left_on = True
 
     def update(_):
+        nonlocal left_on
+        # Toggle left wave every 2 seconds (50 frames at dt=0.04)
+        if frame[0] % 20 == 0:
+            left_on = not left_on
+            sim.clear_waves()
+            sim.wave_from_direction(amplitude=-5.2, frequency=1.8, direction="right")
+            if left_on:
+                sim.wave_from_direction(amplitude=5.6, frequency=4.4, direction="left")
+
         sim.step(dt)
         frame[0] += 1
 
@@ -152,7 +158,7 @@ def run_simulation():
     ani = FuncAnimation(
         fig, update,
         interval=30,        # ms between frames
-        blit=True,
+        blit=False,
         cache_frame_data=False
     )
 
